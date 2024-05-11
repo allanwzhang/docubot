@@ -1,1 +1,1 @@
-Automated documentation for Change++
+Automatic documentation for Change++
