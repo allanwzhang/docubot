@@ -1,5 +1,6 @@
 import requests
 import base64
+from llm import askllm
 
 def retrieve(repo_owner, repo, files_changed):
     files = []
@@ -12,6 +13,7 @@ def retrieve(repo_owner, repo, files_changed):
             files.append(file_content.decode('utf-8'))
         else:
             raise Exception(f"Failed to fetch file: {response.status_code} {response.text}")
-
-    print(file_content)
-    return "updated docs"
+    docs = []
+    for file in files:
+        docs.append(askllm(file))
+    return docs
