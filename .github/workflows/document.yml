@@ -1,0 +1,78 @@
+name: Update README with API Data
+
+on:
+  push:
+    branches:
+      - main  # Trigger on commits to the main branch
+
+jobs:
+  call-api-and-update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Get Changed Files
+      id: get_changed_files
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { owner, repo } = context.repo;
+          const commitSha = context.sha;
+          const commit = await github.rest.repos.getCommit({
+            owner,
+            repo,
+            ref: commitSha
+          });
+          const changedFiles = commit.data.files.map(file => file.filename);
+          console.log("Changed files: ", changedFiles);  // Print changed files for debugging
+          const fs = require('fs');
+          fs.writeFileSync('changedFiles.txt', JSON.stringify(changedFiles));
+
+    - name: Read Changed Files
+      id: read_changed_files
+      run: |
+        if [ -f changedFiles.txt ]; then
+          files_changed=$(cat changedFiles.txt)
+        else
+          files_changed='[]'
+        fi
+        echo "Files changed: $files_changed"  # Debugging step
+
+    - name: Call the API
+      id: call_api
+      run: |
+        if [ -f changedFiles.txt ]; then
+          files_changed=$(cat changedFiles.txt)
+        else
+          files_changed='[]'
+        fi
+        files_changed=$(echo $files_changed | jq .)
+        json_payload=$(jq -n \
+          --arg repo_owner "${{ github.repository_owner }}" \
+          --arg repo "${{ github.event.repository.name }}" \
+          --argjson files_changed "$files_changed" \
+          '{repo_owner: $repo_owner, repo: $repo, files_changed: $files_changed}')
+        echo "JSON Payload: $json_payload"  # Debugging step
+        response=$(curl https://docubot-llpjixmpp-allanwzhangs-projects.vercel.app/document -H "Content-Type: application/json" -d "$json_payload")
+        echo "API Response: $response"  # Debugging step
+        response_content=$(echo $response | jq -r '.updated_doc[0]')
+        echo "$response_content" > response.txt
+
+    - name: Update README
+      run: |
+        echo "# Documentation" > README.md
+        while IFS= read -r line; do
+          echo -e "$line" >> README.md
+        done < response.txt
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git add README.md
+        git commit -m "Update README with API data"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
