@@ -1,12 +1,12 @@
-name: Update README with API Data
+name: Update Documentation with API Data
 
 on:
   push:
     branches:
-      - main  # Trigger on commits to the main branch
+    - main # Trigger on commits to the main branch
 
 jobs:
-  call-api-and-update-readme:
+  call-api-and-update-documentation:
     runs-on: ubuntu-latest
 
     steps:
@@ -60,19 +60,19 @@ jobs:
         response_content=$(echo $response | jq -r '.updated_doc[0]')
         echo "$response_content" > response.txt
 
-    - name: Update README
+    - name: Update Documentation
       run: |
-        echo "# Documentation" > README.md
+        echo "# Documentation" > documentation.md
         while IFS= read -r line; do
-          echo -e "$line" >> README.md
+          echo -e "$line" >> documentation.md
         done < response.txt
 
     - name: Commit and push changes
       run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
-        git add README.md
-        git commit -m "Update README with API data"
+        git add documentation.md
+        git commit -m "Update documentation with API data"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
