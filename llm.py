@@ -1,29 +1,26 @@
-from dotenv import load_dotenv
-import os
 import requests
-import json
 
-load_dotenv()
-api_key = os.getenv('AWANLLM_API_KEY')
-
-def askllm(code):
-    url = "https://api.awanllm.com/v1/chat/completions"
-
-    payload = json.dumps({
-    "model": "Awanllm-Llama-3-8B-Dolfin",
-    "messages": [
-        {
-        "role": "user",
-        "content": f"Can you create documentation for the api endpoints created by this code?\n{code}"
-        }
-    ]
-    })
+def askllm(files, api_key, prev_doc):
+    cohere_api_url = 'https://api.cohere.ai/v1/chat'
     headers = {
-    'Content-Type': 'application/json',
-    'Authorization': f"Bearer {api_key}"
+        'Authorization': f'Bearer {api_key}',
+        'Content-Type': 'application/json'
     }
 
-    response = requests.request("POST", url, headers=headers, data=payload)
-    llm_response = response.json()['choices'][0]['message']['content']
+    combined_content = "Previous Documentation:\n\n" + prev_doc + "\n\nNew Files:\n\n"
+    for file_path, file_content in files:
+        combined_content += f"File: {file_path}\n{file_content.decode('utf-8')}\n\n"
 
-    return llm_response
+    # Create a prompt for generating documentation
+    message = f"Generate comprehensive documentation for the following files. Only generate documentation for api endpoints:\n\n{combined_content}"
+    payload = {
+        'message': message,
+    }
+
+    response = requests.post(cohere_api_url, headers=headers, json=payload)
+
+    if response.status_code == 200:
+        content = response.json()
+        return content['text']
+    else:
+        raise Exception(f"Failed to get response from Cohere: {response.status_code} {response.text}")
