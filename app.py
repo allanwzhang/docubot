@@ -23,7 +23,6 @@ def document():
             return jsonify(message="No files changed."), 200
         
         try:
-            # print(repo_owner, repo, files_changed)
             updated_doc = retrieve(repo_owner, repo, files_changed)
             
             if updated_doc == "No previous documentation found":
