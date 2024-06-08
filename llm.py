@@ -12,7 +12,7 @@ def askllm(files, api_key, prev_doc):
         combined_content += f"File: {file_path}\n{file_content.decode('utf-8')}\n\n"
 
     # Create a prompt for generating documentation
-    message = f"Generate comprehensive documentation for the following files. Only generate documentation for api endpoints:\n\n{combined_content}"
+    message = f"Generate comprehensive documentation for the following files. Only generate documentation for api endpoints. For parameters, make sure to include the variable type. Also, do not preface the response or have some sort of outro:\n\n{combined_content}"
     payload = {
         'message': message,
     }

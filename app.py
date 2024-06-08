@@ -7,7 +7,7 @@ CORS(app)
 
 @app.route('/')
 def home():
-    return 'Hello, Flask! Welcome to Docubot!'
+    return 'Hello, Flask! Welcome to DocuBot!'
 
 @app.route('/document', methods=['POST'])
 def document():
