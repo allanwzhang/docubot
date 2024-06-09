@@ -10,11 +10,6 @@ Docubot is an automated documentation tool that uses GitHub Actions to generate 
 
 ## Getting Started
 
-### Prerequisites
-
-- Python
-- GitHub Account
-
 ### Installation
 
 1. **Set up GitHub Actions**:
