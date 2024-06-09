@@ -17,16 +17,13 @@ Docubot is an automated documentation tool that uses GitHub Actions to generate 
 
 ### Installation
 
-1. **Clone the repository**:
+1. **Set up GitHub Actions**:
 
-   ```bash
-   git clone https://github.com/allanwzhang/docubot.git
-   cd docubot
-   ```
-
-2. **Set up GitHub Actions**:
    - Ensure you have a GitHub repository set up.
    - Create a `.github/workflows/documentation.yml` file in your repository.
+
+2. **Set up files**:
+   - Ensure that you have created a `documentation.md` file in the top level of your repository.
 
 ### GitHub Actions Workflow
 
