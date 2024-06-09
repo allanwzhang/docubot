@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from controller import retrieve
 from flask_cors import CORS
 
@@ -7,7 +7,7 @@ CORS(app)
 
 @app.route('/')
 def home():
-    return 'Hello, Flask! Welcome to DocuBot!'
+    return render_template('index.html')
 
 @app.route('/document', methods=['POST'])
 def document():
