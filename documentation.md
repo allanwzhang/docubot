@@ -1,27 +1,33 @@
-# API Documentation
-
-## Introduction
-
-This documentation outlines the available API endpoints and their functionalities for interacting with the application. 
-
-Base URL: `https://docubot-two.vercel.app/`
-
-## Endpoints
+## API Endpoints
 
 ### /document
 
-**Method:** POST
+- **Method:** POST
 
-**Request Body:**
+- **Request Body Parameters:**
 
-- `repo_owner`: String. The owner of the repository.
-- `repo`: String. The name of the repository.
-- `files_changed`: Array of Strings. A list of filenames that have changed.
+ - `repo_owner`: String. The owner of the GitHub repository.
+ - `repo`: String. The name of the GitHub repository.
+ - `files_changed`: Array of Strings. A list of filenames that have changed in the repository.
 
-**Response:**
+- **Example Request Body:**
 
-- `updated_doc`: String. The updated documentation in Markdown format.
+ ```json
+ {
+ "repo_owner": "allanwzhang",
+ "repo": "docubot",
+ "files_changed": ["README.md", "src/main.py"]
+ }
+ ```
 
---- 
+- **Response:**
 
-This comprehensive documentation provides a clear outline of the API endpoints, including the request parameters and the expected responses. It serves as a reference for developers looking to interact with the application's API.
+ - `updated_doc`: String. The updated documentation in Markdown format, containing the changes reflected in the specified files.
+
+- **Response Example:**
+
+ ```json
+ {
+ "updated_doc": "# Docubot\n\n[...]\n\n## New Changes\n\n- Updated README.md with latest features.\n- Refactored code in src/main.py for improved performance."
+ }
+ ```
