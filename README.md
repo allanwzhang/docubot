@@ -21,7 +21,7 @@ Docubot is an automated documentation tool that uses GitHub Actions to generate 
    - Ensure that you have created a `documentation.md` file in the top level of your repository.
 
 3. **Github Actions Permissions**:
-   - Ensure your project gives Github actions the permission to read and write
+   - Ensure your project gives Github actions the permission to read, write, and push to main.
    
 ### GitHub Actions Workflow
 
