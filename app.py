@@ -1,9 +1,18 @@
 from flask import Flask, jsonify, request, render_template
 from controller import retrieve
 from flask_cors import CORS
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from mangum import Mangum
+from asgiref.wsgi import WsgiToAsgi
+import logging
+import json
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 CORS(app)
+
+@app.route('/debug', methods=['GET'])
+def debug_route():
+    return jsonify({'message': 'Debug route works!'})
 
 @app.route('/')
 def home():
@@ -30,10 +39,16 @@ def document():
 
             return jsonify({'updated_doc': updated_doc})
         except Exception as e:
-            print(f"Exception: {e}")
+            logging.error(f"Exception: {e}")
             return jsonify(error="Failed to fetch files"), 400
     else:
         return jsonify(message="Request was not JSON"), 400
 
-if __name__ == '__main__':
-    app.run(debug=True)
+asgi_app = WsgiToAsgi(app)
+handler = Mangum(asgi_app, lifespan="off")
+
+def lambda_handler(event, context):
+    return handler(event, context)
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5001)

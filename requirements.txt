@@ -6,3 +6,5 @@ MarkupSafe==2.1.5
 python-dotenv==1.0.1
 Flask-Cors==4.0.1
 requests==2.31.0
+mangum==0.19.0
+asgiref==3.8.1
