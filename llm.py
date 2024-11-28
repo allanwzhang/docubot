@@ -1,5 +1,8 @@
 import httpx
 import logging
+import os
+
+timeout = os.getenv('TIMEOUT')
 
 async def askllm(files, api_key, prev_doc):
     cohere_api_url = 'https://api.cohere.ai/v1/chat'
@@ -19,7 +22,7 @@ async def askllm(files, api_key, prev_doc):
 
     try:
         # Use httpx for async HTTP requests
-        async with httpx.AsyncClient(timeout=30) as client:
+        async with httpx.AsyncClient(timeout=int(timeout)) as client:
             response = await client.post(cohere_api_url, headers=headers, json=payload)
 
         if response.status_code == 200:
