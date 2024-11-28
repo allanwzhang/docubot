@@ -1,6 +1,7 @@
-import requests
+import httpx
+import logging
 
-def askllm(files, api_key, prev_doc):
+async def askllm(files, api_key, prev_doc):
     cohere_api_url = 'https://api.cohere.ai/v1/chat'
     headers = {
         'Authorization': f'Bearer {api_key}',
@@ -11,16 +12,21 @@ def askllm(files, api_key, prev_doc):
     for file_path, file_content in files:
         combined_content += f"File: {file_path}\n{file_content.decode('utf-8')}\n\n"
 
-    # Create a prompt for generating documentation
-    message = f"Generate comprehensive documentation for the following files. Only generate documentation for api endpoints or for new classes. For parameters, make sure to include the variable type. Also, do not preface the response or have some sort of outro:\n\n{combined_content}"
+    message = f"Generate comprehensive documentation for the following files. Only generate documentation for API endpoints or for new classes. Include parameter types, and avoid prefacing or adding outros:\n\n{combined_content}"
     payload = {
         'message': message,
     }
 
-    response = requests.post(cohere_api_url, headers=headers, json=payload)
+    try:
+        # Use httpx for async HTTP requests
+        async with httpx.AsyncClient() as client:
+            response = await client.post(cohere_api_url, headers=headers, json=payload)
 
-    if response.status_code == 200:
-        content = response.json()
-        return content['text']
-    else:
-        raise Exception(f"Failed to get response from Cohere: {response.status_code} {response.text}")
+        if response.status_code == 200:
+            content = response.json()
+            return content.get('text', "No text in response")
+        else:
+            raise Exception(f"Failed to get response from Cohere: {response.status_code} {response.text}")
+    except Exception as e:
+        logging.error(f"Exception in askllm: {e}")
+        raise

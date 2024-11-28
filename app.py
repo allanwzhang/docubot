@@ -5,6 +5,7 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from mangum import Mangum
 from asgiref.wsgi import WsgiToAsgi
 import logging
+import asyncio
 import json
 
 app = Flask(__name__, template_folder='templates')
@@ -28,19 +29,18 @@ def document():
             return jsonify(error="Missing data: 'repo' and 'repo_owner' required."), 400
         if not files_changed:
             return jsonify(message="No files changed."), 200
-        
+
         try:
-            updated_doc = retrieve(repo_owner, repo, files_changed, github_token)
-            
+            updated_doc = asyncio.run(retrieve(repo_owner, repo, files_changed, github_token))
             if updated_doc == "No previous documentation found":
                 return jsonify({'error': "No previous documentation found"})
-
             return jsonify({'updated_doc': updated_doc})
         except Exception as e:
             logging.error(f"Exception: {e}")
             return jsonify(error="Failed to fetch files"), 400
     else:
         return jsonify(message="Request was not JSON"), 400
+
 
 asgi_app = WsgiToAsgi(app)
 handler = Mangum(asgi_app, lifespan="off")
