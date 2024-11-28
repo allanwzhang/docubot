@@ -15,7 +15,7 @@ async def askllm(files, api_key, prev_doc):
     for file_path, file_content in files:
         combined_content += f"File: {file_path}\n{file_content.decode('utf-8')}\n\n"
 
-    message = f"Generate comprehensive documentation for the following files. Only generate documentation for API endpoints or for new classes. Include parameter types, and avoid prefacing or adding outros:\n\n{combined_content}"
+    message = f"Generate comprehensive documentation for the following files. Only generate documentation for API endpoints. Include parameter types, and avoid prefacing or adding outros:\n\n{combined_content}"
     payload = {
         'message': message,
     }
