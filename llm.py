@@ -19,7 +19,7 @@ async def askllm(files, api_key, prev_doc):
 
     try:
         # Use httpx for async HTTP requests
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=30) as client:
             response = await client.post(cohere_api_url, headers=headers, json=payload)
 
         if response.status_code == 200:
@@ -27,6 +27,10 @@ async def askllm(files, api_key, prev_doc):
             return content.get('text', "No text in response")
         else:
             raise Exception(f"Failed to get response from Cohere: {response.status_code} {response.text}")
+    except httpx.TimeoutException:
+        logging.error(f"Request to Cohere API timed out after {timeout} seconds.")
+        return "Failed to generate documentation due to timeout."
     except Exception as e:
+        print({e})
         logging.error(f"Exception in askllm: {e}")
         raise
