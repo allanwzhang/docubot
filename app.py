@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, logging
 from controller import retrieve
 from flask_cors import CORS
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
@@ -10,21 +10,19 @@ import json
 app = Flask(__name__, template_folder='templates')
 CORS(app)
 
-@app.route('/debug', methods=['GET'])
-def debug_route():
-    return jsonify({'message': 'Debug route works!'})
-
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html'), 200
 
 @app.route('/document', methods=['POST'])
 def document():
     if request.is_json:
         data = request.get_json()
+
         repo_owner = data.get('repo_owner')
         repo = data.get('repo')
         files_changed = data.get('files_changed')
+        github_token = data.get('github_token')
 
         if not repo_owner or not repo:
             return jsonify(error="Missing data: 'repo' and 'repo_owner' required."), 400
@@ -32,7 +30,7 @@ def document():
             return jsonify(message="No files changed."), 200
         
         try:
-            updated_doc = retrieve(repo_owner, repo, files_changed)
+            updated_doc = retrieve(repo_owner, repo, files_changed, github_token)
             
             if updated_doc == "No previous documentation found":
                 return jsonify({'error': "No previous documentation found"})
